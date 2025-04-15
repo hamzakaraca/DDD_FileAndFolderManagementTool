@@ -22,7 +22,7 @@ namespace Application.Concrete
             if (folder == null || string.IsNullOrEmpty(folder.FullPath))
                 throw new ArgumentException("Klasör geçerli değil.");
 
-            var fullFileName = $"{fileName}.{extension.TrimStart('.')}";
+            var fullFileName = $"{fileName}.{extension}";
             var filePath = Path.Combine(folder.FullPath, fullFileName);
 
             // Dosya fiziksel olarak oluşturuluyor

@@ -12,9 +12,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IFolderLoaderService, FolderLoaderService>();
-builder.Services.AddScoped<IFileDeleteService, FileDeleteService>();
+builder.Services.AddScoped<IFolderDeleteService, FolderDeleteService>();
 builder.Services.AddScoped<IFolderCreaterService, FolderCreaterService>();
 builder.Services.AddScoped<IFolderRepository, FolderRepository>();
+builder.Services.AddScoped<IFolderSearcherService, FolderSearcherService>();
 
 var app = builder.Build();
 

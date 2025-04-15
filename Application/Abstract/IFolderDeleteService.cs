@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Application.Abstract
 {
-    public interface IFileDeleteService
+    public interface IFolderDeleteService
     {
         public void DeleteFile(Folder folder,Domain.Entities.File file);
         public void DeleteFolder(Folder folder);

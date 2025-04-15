@@ -10,10 +10,10 @@ using System.Threading.Tasks;
 
 namespace Application.Concrete
 {
-    public class FileDeleteService : IFileDeleteService
+    public class FolderDeleteService : IFolderDeleteService
     {
         IFolderRepository _folderRepository;
-        public FileDeleteService(IFolderRepository folderRepository)
+        public FolderDeleteService(IFolderRepository folderRepository)
         {
             _folderRepository = folderRepository;
         }
@@ -30,9 +30,8 @@ namespace Application.Concrete
 
             try
             {
-                var afolder = _folderRepository.GetByPath(folder.FullPath);           // Domain'den sil
-
-                afolder.DeleteFile(file);           // Domain'den sil
+                var deleteForFolder = _folderRepository.GetByPath(folder.FullPath);           // Uygun klasörü bul
+                deleteForFolder.DeleteFile(file);           // Domain'den sil
                 System.IO.File.Delete(file.Path);  // Dosyayı sistemden sil
                           
             }
@@ -53,7 +52,7 @@ namespace Application.Concrete
                 throw new Exception("Klasör Bulunamadı: ");
 
             }
-            Directory.Delete(folder.FullPath, recursive: true);
+            _folderRepository.Delete(folder.FullPath); // Klasörü sil
         }
     }
 }

@@ -18,23 +18,63 @@ namespace DataAccess.Concrete
             var folderName = new DirectoryInfo(path).Name;
             var folder = new Folder(folderName, path);
 
-            // Klasördeki dosyaları yükle
-            foreach (var filePath in Directory.GetFiles(path))
+            try
             {
-                var fileInfo = new FileInfo(filePath);
-                var file = new Domain.Entities.File(fileInfo.Name, fileInfo.Extension, fileInfo.Length, filePath, fileInfo.CreationTime);
-                folder.AddFile(file);
-            }
+                var fileLock = new object();
+                var folderLock = new object();
 
-            // Alt klasörleri yükle
-            foreach (var subfolderPath in Directory.GetDirectories(path))
-            {
-                var subfolder = GetByPath(subfolderPath);
-                if (subfolder != null)
+                // Dosyaları paralel olarak yükle
+                Parallel.ForEach(Directory.GetFiles(path), filePath =>
                 {
-                    folder.AddChildFolder(subfolder);
-                }
+                    try
+                    {
+                        var fileInfo = new FileInfo(filePath);
+                        var file = new Domain.Entities.File(
+                            fileInfo.Name,
+                            fileInfo.Extension.TrimStart('.'),
+                            fileInfo.Length,
+                            filePath,
+                            fileInfo.CreationTime
+                        );
+
+                        lock (fileLock)  // Aynı anda _files listesine ekleme yapılmasın
+                        {
+                            folder.AddFile(file);
+                        }
+                    }
+                    catch
+                    {
+                        // Hatalı dosya varsa atla
+                    }
+                });
+
+                // Alt klasörleri paralel olarak yükle
+                Parallel.ForEach(Directory.GetDirectories(path), subfolderPath =>
+                {
+                    try
+                    {
+                        var subfolder = GetByPath(subfolderPath);
+                        if (subfolder != null)
+                        {
+                            lock (folderLock)  // Aynı anda _childFolders listesine ekleme yapılmasın
+                            {
+                                folder.AddChildFolder(subfolder);
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // Hatalı klasör varsa atla
+                    }
+                });
+
             }
+            catch (UnauthorizedAccessException)
+            {
+
+                
+            }
+            
 
             return folder;
         }
@@ -51,14 +91,10 @@ namespace DataAccess.Concrete
 
         public void Delete(string path)
         {
-            if (Directory.Exists(path))
-            {
-                Directory.Delete(path, true);  // Klasörü ve içeriğini sil
-            }
+            
+            Directory.Delete(path, true);  // Klasörü ve içeriğini sil
+            
         }
-
-        
-
 
     }
 }

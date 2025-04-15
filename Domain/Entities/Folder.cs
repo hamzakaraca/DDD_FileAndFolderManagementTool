@@ -63,6 +63,7 @@ namespace Domain.Entities
 
         public List<File> SearchFilesByExtension(string extension)
         {
+
             var result = new List<File>();
             result.AddRange(Files.Where(f => f.Extension.Contains(extension, StringComparison.OrdinalIgnoreCase)));
 
