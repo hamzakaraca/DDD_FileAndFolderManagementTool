@@ -1,5 +1,6 @@
 ﻿using Application.Abstract;
 using DataAccess.Abstract;
+using Domain.DTOs;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -7,26 +8,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Concrete
+namespace Application
 {
-    public class FolderCreaterService : IFolderCreaterService
+    public class FolderCreateService : IFolderCreateService
     {
         IFolderRepository _folderRepository;
-        public FolderCreaterService(IFolderRepository folderRepository)
+        public FolderCreateService(IFolderRepository folderRepository)
         {
             _folderRepository = folderRepository;
         }
 
-        public void AddFileToFolder(Folder folder, string fileName, string content, string extension)
+        public void AddFileToFolder(AddFileDto addFileDto)
         {
-            if (folder == null || string.IsNullOrEmpty(folder.FullPath))
+            if (addFileDto.Folder == null || string.IsNullOrEmpty(addFileDto.Folder.FullPath))
                 throw new ArgumentException("Klasör geçerli değil.");
 
-            var fullFileName = $"{fileName}.{extension}";
-            var filePath = Path.Combine(folder.FullPath, fullFileName);
+            var fullFileName = $"{addFileDto.Name}.{addFileDto.Extension}";
+            var filePath = Path.Combine(addFileDto.Folder.FullPath,addFileDto.Folder.Name, fullFileName);
 
             // Dosya fiziksel olarak oluşturuluyor
-            System.IO.File.WriteAllText(filePath, content);
+            System.IO.File.WriteAllText(filePath, addFileDto.Content);
 
             // Domain'e yansıtılıyor
             var fileInfo = new FileInfo(filePath);
@@ -38,13 +39,14 @@ namespace Application.Concrete
                 fileInfo.CreationTime
             );
 
-            folder.AddFile(domainFile);
+            addFileDto.Folder.AddFile(domainFile);
         }
 
 
-        public string AddFolder(string path)
+        public string AddFolder(string path, string folderName)
         {
-            var result = Directory.CreateDirectory(path);
+            var folderPath = Path.Combine(path, folderName);
+            var result = Directory.CreateDirectory(folderPath);
             return result.Name;
         }
     }

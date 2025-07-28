@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Concrete
+namespace Application
 {
-    public class FolderLoaderService : IFolderLoaderService
+    public class FolderLoadService : IFolderLoadService
     {
         public Folder LoadFolder(string path)
         {

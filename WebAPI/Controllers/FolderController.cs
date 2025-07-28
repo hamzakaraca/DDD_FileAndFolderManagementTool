@@ -11,17 +11,17 @@ namespace WebAPI.Controllers
     [ApiController]
     public class FolderController : ControllerBase
     {
-        IFolderLoaderService _folderLoaderService;
+        IFolderLoadService _folderLoadService;
         IFolderDeleteService _fileDeleteService;
-        IFolderCreaterService _folderCreaterService;
-        IFolderSearcherService _folderSearcherService;
+        IFolderCreateService _folderCreateService;
+        IFolderSearchService _folderSearchService;
         IFolderRepository _folderRepository;
-        public FolderController(IFolderLoaderService folderLoaderService, IFolderDeleteService fileDeleteService, IFolderCreaterService folderCreaterService, IFolderSearcherService folderSearcherService,IFolderRepository folderRepository)
+        public FolderController(IFolderLoadService folderLoaderService, IFolderDeleteService fileDeleteService, IFolderCreateService folderCreaterService, IFolderSearchService folderSearcherService,IFolderRepository folderRepository)
         {
-            _folderLoaderService = folderLoaderService;
+            _folderLoadService = folderLoaderService;
             _fileDeleteService = fileDeleteService;
-            _folderCreaterService = folderCreaterService;
-            _folderSearcherService = folderSearcherService;
+            _folderCreateService = folderCreaterService;
+            _folderSearchService = folderSearcherService;
             _folderRepository = folderRepository;
         }
 
@@ -29,7 +29,7 @@ namespace WebAPI.Controllers
         [HttpGet("[action]")]
         public IActionResult LoadFolder(string path)
         {
-            var result = _folderLoaderService.LoadFolder(path);
+            var result = _folderLoadService.LoadFolder(path);
             return Ok(result);
         }
 
@@ -41,10 +41,10 @@ namespace WebAPI.Controllers
         }
 
         [HttpPost("[action]")]
-        public IActionResult AddFolder(string path)
+        public IActionResult AddFolder(string path,string folderName)
         {
 
-            var result=_folderCreaterService.AddFolder(path);
+            var result=_folderCreateService.AddFolder(path, folderName);
             return Ok(result);
         }
 
@@ -52,7 +52,7 @@ namespace WebAPI.Controllers
         public IActionResult AddFile(AddFileDto addFileDto)
         {
 
-            _folderCreaterService.AddFileToFolder(addFileDto.Folder,addFileDto.FileName,addFileDto.Content,addFileDto.Extension);
+            _folderCreateService.AddFileToFolder(addFileDto);
             return Ok();
         }
 
@@ -68,7 +68,24 @@ namespace WebAPI.Controllers
         {
 
             var folder=_folderRepository.GetByPath(folderPath);
-            var result = _folderSearcherService.SearchFilesByExtension(extension,folder);
+            var result = _folderSearchService.SearchFilesByExtension(extension,folder);
+            return Ok(result);
+        }
+
+        [HttpGet("[action]")]
+        public IActionResult SearchFilesByName(string name, string? folderPath)
+        {
+
+            var folder = _folderRepository.GetByPath(folderPath);
+            var result = _folderSearchService.SearchFilesByName(name, folder);
+            return Ok(result);
+        }
+        [HttpGet("[action]")]
+        public IActionResult SearchFilesByCreationDate(DateTime creationDate, string? folderPath)
+        {
+
+            var folder = _folderRepository.GetByPath(folderPath);
+            var result = _folderSearchService.SearchFilesByCreationDate(creationDate, folder);
             return Ok(result);
         }
     }

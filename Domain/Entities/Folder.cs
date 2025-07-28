@@ -74,6 +74,19 @@ namespace Domain.Entities
             return result;
 
         }
+        public List<File> SearchFilesByName(string extension)
+        {
+
+            var result = new List<File>();
+            result.AddRange(Files.Where(f => f.Name.Contains(extension, StringComparison.OrdinalIgnoreCase)));
+
+            foreach (var child in ChildFolders)
+            {
+                result.AddRange(child.SearchFilesByName(extension));
+            }
+            return result;
+
+        }
 
         public List<File> SearchFilesByCreationDate(DateTime creationDate)
         {

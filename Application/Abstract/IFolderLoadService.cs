@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Application.Abstract
 {
-    public interface IFolderSearcherService
+    public interface IFolderLoadService
     {
-        public List<Domain.Entities.File> SearchFilesByExtension(string extension,Folder folder);
+        public Folder LoadFolder(string path);
     }
 }

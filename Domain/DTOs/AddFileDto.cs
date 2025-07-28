@@ -10,7 +10,7 @@ namespace Domain.DTOs
     public class AddFileDto
     {
         public Folder Folder { get; set; }
-        public string FileName { get; set; }
+        public string Name { get; set; }
         public string Content { get; set; }
 
         public string Extension { get; set; }
